@@ -2,11 +2,13 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-COPY ContactApi/*.csproj ./ContactApi/
-RUN dotnet restore ./ContactApi/ContactApi.csproj
+# Copia o .csproj e restaura dependências
+COPY *.csproj ./
+RUN dotnet restore
 
+# Copia todos os arquivos restantes e publica
 COPY . ./
-RUN dotnet publish ./ContactApi/ContactApi.csproj -c Release -o /app/out
+RUN dotnet publish -c Release -o /app/out
 
 # Etapa de runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
