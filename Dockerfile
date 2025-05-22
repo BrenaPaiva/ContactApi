@@ -2,20 +2,15 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-# Copia arquivos e restaura dependências
-COPY *.csproj ./
-RUN dotnet restore
+COPY ContactApi/*.csproj ./ContactApi/
+RUN dotnet restore ./ContactApi/ContactApi.csproj
 
-# Copia o restante e faz o build
 COPY . ./
-RUN dotnet publish -c Release -o out
+RUN dotnet publish ./ContactApi/ContactApi.csproj -c Release -o /app/out
 
 # Etapa de runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /app/out .
-
-# Define a porta padrão (ajuste se necessário)
-EXPOSE 80
 
 ENTRYPOINT ["dotnet", "ContactApi.dll"]
