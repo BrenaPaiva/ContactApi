@@ -1,16 +1,20 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+﻿# Etapa 1: Build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-# Como estamos dentro da pasta ContactApi, copiamos só o projeto e arquivos dela
-COPY *.csproj ./
-RUN dotnet restore
+# Copia tudo
+COPY . . 
 
-COPY . ./
+# Restaura, compila e publica
+RUN dotnet restore ContactApi.sln
+RUN dotnet publish ContactApi.csproj -c Release -o /app/out
 
-RUN dotnet publish -c Release -o /app/out
-
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# Etapa 2: Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-COPY --from=build /app/out ./
+COPY --from=build /app/out .
+
+EXPOSE 5000
+ENV ASPNETCORE_URLS=http://+:5000
 
 ENTRYPOINT ["dotnet", "ContactApi.dll"]
