@@ -8,4 +8,4 @@ COPY *.csproj ./
 COPY . ./
 
 RUN dotnet restore
-RUN dotnet publish -c Release -o /app/out --no-restore
+RUN dotnet publish ContactApi.csproj -c Release -o /app/out --no-restore
