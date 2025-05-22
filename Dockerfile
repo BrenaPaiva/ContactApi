@@ -2,9 +2,13 @@
 WORKDIR /app
 
 COPY *.sln ./
-COPY *.csproj ./
-# Se houver múltiplos projetos, repita para cada pasta de projeto
+# Copie a solução
+COPY *.sln ./
 
+# Copie os arquivos de projeto e dependências
+COPY ContactApi/*.csproj ./ContactApi/
+
+# Copie o restante do código-fonte
 COPY . ./
 
 RUN dotnet restore
