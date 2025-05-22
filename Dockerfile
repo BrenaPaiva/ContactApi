@@ -1,18 +1,20 @@
-﻿# Etapa de build
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+﻿FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-# Copia o .csproj e restaura dependências
-COPY *.csproj ./
+# Copiar arquivos do projeto para o container
+COPY *.sln .
+COPY ContactApi/*.csproj ./ContactApi/
 RUN dotnet restore
 
-# Copia todos os arquivos restantes e publica
-COPY . ./
+# Copiar todo o código
+COPY ContactApi/. ./ContactApi/
+
+# Build e publish
+WORKDIR /app/ContactApi
 RUN dotnet publish -c Release -o /app/out
 
-# Etapa de runtime
+# Build da imagem runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build /app/out .
-
+COPY --from=build /app/out ./
 ENTRYPOINT ["dotnet", "ContactApi.dll"]
