@@ -2,7 +2,7 @@
 WORKDIR /app
 
 COPY *.sln ./
-COPY src/*.csproj ./src/
+COPY *.csproj ./
 # Se houver múltiplos projetos, repita para cada pasta de projeto
 
 COPY . ./
