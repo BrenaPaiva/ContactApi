@@ -1,25 +1,25 @@
-﻿# Etapa 1: Build
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+﻿# Etapa 1: build da aplicação
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /app
 
-# Copia a solução e o projeto (estão na raiz da pasta onde está o Dockerfile)
-COPY ContactApi.sln ./
-COPY ContactApi.csproj ./
-
+# Copiar o arquivo .csproj e restaurar dependências
+COPY ContactApi/*.csproj ./ContactApi/
+WORKDIR /app/ContactApi
 RUN dotnet restore
 
-# Copia o restante do código-fonte
+# Copiar o restante do código
 COPY . .
 
-RUN dotnet publish -c Release -o /app/out --no-restore
+# Publicar a aplicação em modo Release
+RUN dotnet publish -c Release -o /app/out
 
-# Etapa 2: Runtime
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+# Etapa 2: imagem para rodar a aplicação
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
 WORKDIR /app
+COPY --from=build /app/out ./
 
-COPY --from=build /app/out .
+# Expor porta da API
+EXPOSE 80
 
-EXPOSE 5000
-ENV ASPNETCORE_URLS=http://+:5000
-
+# Comando para iniciar a API
 ENTRYPOINT ["dotnet", "ContactApi.dll"]
