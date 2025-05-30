@@ -1,25 +1,26 @@
-﻿# Etapa 1: build da aplicação
+﻿# Etapa 1: Build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-# Copiar o arquivo .csproj e restaurar dependências
-COPY ContactApi/*.csproj ./ContactApi/
-WORKDIR /app/ContactApi
+# Copia o arquivo .csproj e restaura as dependências
+COPY ContactApi.csproj ./
 RUN dotnet restore
 
-# Copiar o restante do código
-COPY . .
+# Copia todos os arquivos do projeto
+COPY . ./
 
-# Publicar a aplicação em modo Release
-RUN dotnet publish -c Release -o /app/out
+# Compila o projeto
+RUN dotnet publish -c Release -o out
 
-# Etapa 2: imagem para rodar a aplicação
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+# Etapa 2: Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build /app/out ./
 
-# Expor porta da API
+# Copia os arquivos da build
+COPY --from=build /app/out .
+
+# Expõe a porta padrão (ajuste se for diferente)
 EXPOSE 80
 
-# Comando para iniciar a API
+# Define o ponto de entrada
 ENTRYPOINT ["dotnet", "ContactApi.dll"]
